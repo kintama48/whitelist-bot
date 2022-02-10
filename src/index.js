@@ -37,17 +37,27 @@ async function updateChannelStats(guild) {
     let wl2 = await guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST2_CHANNEL_ID);
     wlRole = await guild.roles.cache.find(role => role.id === process.env.WL_ROLE_ID);
     wl2Role = await guild.roles.cache.find(role => role.id === process.env.WL2_ROLE_ID);
-    await wl.setName(`📜│Whitelist: ${(wlRole.members.length)}`);
-    await wl2.setName(`📜│WL+: ${wl2Role.members.length}`);
+    await wl.setName(`📜│Whitelist: ${(wlRole.members.size)}`);
+    await wl2.setName(`📜│WL+: ${wl2Role.members.size}`);
 }
 
 //-------------- Update Whitelist+ --------------//
-bot.on('guildMemberUpdate', async function (oldMember, newMember){
+bot.on('guildMemberUpdate', async (oldMember, newMember) => {
     console.log('inside guildMemberUpdate')
-    if (newMember.roles.cache.find(role=>role.id===process.env.WL2_ROLE_ID)){
-        let wl2 = await newMember.guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST2_CHANNEL_ID);
-        if (wl2){
-            await wl2.setName(`📜│WL+: ${Number(wl2.name.split(/: /)[1]) + 1}`)
+    if  (oldMember.roles.cache.size < newMember.roles.cache.size || oldMember.roles.cache.size > newMember.roles.cache.size) {
+        const fetchedLogs = await oldMember.guild.fetchAuditLogs({
+            limit: 1,
+            type: 'MEMBER_ROLE_UPDATE'})
+
+        const roleAddLog = fetchedLogs.entries.first();
+        if (!roleAddLog ) return;
+        const { executor, target, changes} = roleAddLog;
+        if (changes[0].new[0].id === process.env.WL2_ROLE_ID){
+            let wl2 = await newMember.guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST2_CHANNEL_ID);
+            wl2Role = await newMember.guild.roles.cache.find(role => role.id === process.env.WL2_ROLE_ID);
+            if (wl2){
+                await wl2.setName(`📜│WL+: ${wl2Role.members.size}`);
+            }
         }
     }
 })
