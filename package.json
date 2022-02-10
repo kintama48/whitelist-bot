@@ -4,7 +4,7 @@
   "description": "A bot which changes the roles of the user on command and tracks the members of the server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/kintama48/whitelist-bot/issues"
   },
-  "homepage": "https://github.com/kintama48/whitelist-bot#readme"
+  "homepage": "https://github.com/kintama48/whitelist-bot#readme",
+  "dependencies": {
+    "discord-reply": "^0.1.2",
+    "discord.js": "~12.5.3",
+    "dotenv": "^16.0.0",
+    "node": "~16.13.2"
+  }
 }
