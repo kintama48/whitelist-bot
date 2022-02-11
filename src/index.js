@@ -45,20 +45,12 @@ async function updateChannelStats(guild) {
 bot.on('guildMemberUpdate', async (oldMember, newMember) => {
     console.log('inside guildMemberUpdate')
     if  (oldMember.roles.cache.size < newMember.roles.cache.size || oldMember.roles.cache.size > newMember.roles.cache.size) {
-        const fetchedLogs = await oldMember.guild.fetchAuditLogs({
-            limit: 1,
-            type: 'MEMBER_ROLE_UPDATE'})
-
-        const roleAddLog = fetchedLogs.entries.first();
-        if (!roleAddLog ) return;
-        const { executor, target, changes} = roleAddLog;
-        if (changes[0].new[0].id === process.env.WL2_ROLE_ID){
-            let wl2 = await newMember.guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST2_CHANNEL_ID);
-            wl2Role = await newMember.guild.roles.cache.find(role => role.id === process.env.WL2_ROLE_ID);
-            if (wl2){
-                await wl2.setName(`📜│WL+: ${wl2Role.members.size}`);
-            }
-        }
+        let wl2 = await newMember.guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST2_CHANNEL_ID);
+        let wl = await newMember.guild.channels.cache.find(channel=>channel.id === process.env.WHITELIST_CHANNEL_ID);
+        wlRole = await newMember.guild.roles.cache.find(role => role.id === process.env.WL_ROLE_ID);
+        wl2Role = await newMember.guild.roles.cache.find(role => role.id === process.env.WL2_ROLE_ID);
+        wl2.setName(`📜│WL+: ${wl2Role.members.size}`);
+        wl.setName(`📜│Whitelist: ${(wlRole.members.size)}`)
     }
 })
 
@@ -115,10 +107,11 @@ bot.on('message', async function (message) {
                 await member.roles.add(await wlRole);
                 await message.member.roles.remove(await wl2Role);
                 await message.member.roles.add(await wlRole);
-                await updateChannelStats(message.member.guild);
                 embed.setDescription(`**Operation Successful**\n<@!${member.id}> was given <@&${wlRole.id}> role by <@!${message.author.id}>!`)
                     .setColor(3447003).setTimestamp();
                 await message.lineReply(embed);
+                await updateChannelStats(message.member.guild);
+
             } else if (!authorHasRoleFlag){
                 embed.setDescription(`**Operation Unsuccessful**\n<@!${message.author.id}> You don't have <@&${wl2Role.id}> therefore you can't whitelist <@!${member.id}>!`)
                     .setColor(0xFF0000).setTimestamp();
