@@ -21,13 +21,8 @@ bot.on('ready', async function () {
 //-------------- Event handler to update stats of the server when a member joins guild --------------//
 bot.on('guildMemberAdd', async function (member){
     let channel = await member.guild.channels.cache.find(channel=>channel.id === process.env.TOTAL_MEMBERS_CHANNEL_ID)
-    await channel.setName(`👤┃Members: ${member.guild.memberCount}`)
-})
-
-//-------------- Event handler to update stats of the server when a member joins guild --------------//
-bot.on('guildMemberRemove', async function (member){
-    let channel = await member.guild.channels.cache.find(channel=>channel.id === process.env.TOTAL_MEMBERS_CHANNEL_ID)
-    await channel.setName(`👤┃Members: ${member.guild.memberCount}`)
+    let memberCount = myGuild.members.cache.filter(member => !member.user.bot).size;
+    await channel.setName(`👤┃Members: ${memberCount}`)
 })
 
 //-------------- Event handler to update stats of the server when the !whitelist command is executed --------------//
